@@ -2,97 +2,18 @@
 	<div>
 		<div class="movie_body">
 				<ul>
-					<li>
-						<div class="pic_show"><img src="/images/movie_1.jpg"></div>
+					<li v-for="item in movieList" :key="item.id">
+						<!-- <img src="/images/movie_1.jpg"> 这里要修改为动态，就需要把src变成绑定:src -->
+						<div class="pic_show"><img :src="item.img | setWH('128.180')"></div>
+						<!-- ps：这里遇到了img404的问题， http://p1.meituan.net/w.h/moviemachine/6664cd8c31f1254bc52793a158dc53ff8811971.jpg 404 (Not Found) -->
+						<!-- 看上面的报错中看到了w.h的问题，这是动态的地址，代表w宽，h高，加上这里是v-for，所以我们要写计算属性来做 -->
+						<!-- 但如果每个组件都写就比较麻烦，所以直接写一个全局的过滤器，在main.js里setWH(w.h) -->
 						<div class="info_list">
-							<h2>无名之辈</h2>
-							<p>观众评 <span class="grade">9.2</span></p>
-							<p>主演: 陈建斌,任素汐,潘斌龙</p>
-							<p>今天55家影院放映607场</p>
-						</div>
-						<div class="btn_mall">
-							购票
-						</div>
-					</li>
-					<li>
-						<div class="pic_show"><img src="/images/movie_2.jpg"></div>
-						<div class="info_list">
-							<h2>毒液：致命守护者</h2>
-							<p>观众评 <span class="grade">9.3</span></p>
-							<p>主演: 汤姆·哈迪,米歇尔·威廉姆斯,里兹·阿迈德</p>
-							<p>今天56家影院放映443场</p>
-						</div>
-						<div class="btn_mall">
-							购票
-						</div>
-					</li>
-					<li>
-						<div class="pic_show"><img src="/images/movie_1.jpg"></div>
-						<div class="info_list">
-							<h2>无名之辈</h2>
-							<p>观众评 <span class="grade">9.2</span></p>
-							<p>主演: 陈建斌,任素汐,潘斌龙</p>
-							<p>今天55家影院放映607场</p>
-						</div>
-						<div class="btn_mall">
-							购票
-						</div>
-					</li>
-					<li>
-						<div class="pic_show"><img src="/images/movie_2.jpg"></div>
-						<div class="info_list">
-							<h2>毒液：致命守护者</h2>
-							<p>观众评 <span class="grade">9.3</span></p>
-							<p>主演: 汤姆·哈迪,米歇尔·威廉姆斯,里兹·阿迈德</p>
-							<p>今天56家影院放映443场</p>
-						</div>
-						<div class="btn_mall">
-							购票
-						</div>
-					</li>
-					<li>
-						<div class="pic_show"><img src="/images/movie_1.jpg"></div>
-						<div class="info_list">
-							<h2>无名之辈</h2>
-							<p>观众评 <span class="grade">9.2</span></p>
-							<p>主演: 陈建斌,任素汐,潘斌龙</p>
-							<p>今天55家影院放映607场</p>
-						</div>
-						<div class="btn_mall">
-							购票
-						</div>
-					</li>
-					<li>
-						<div class="pic_show"><img src="/images/movie_2.jpg"></div>
-						<div class="info_list">
-							<h2>毒液：致命守护者</h2>
-							<p>观众评 <span class="grade">9.3</span></p>
-							<p>主演: 汤姆·哈迪,米歇尔·威廉姆斯,里兹·阿迈德</p>
-							<p>今天56家影院放映443场</p>
-						</div>
-						<div class="btn_mall">
-							购票
-						</div>
-					</li>
-					<li>
-						<div class="pic_show"><img src="/images/movie_1.jpg"></div>
-						<div class="info_list">
-							<h2>无名之辈</h2>
-							<p>观众评 <span class="grade">9.2</span></p>
-							<p>主演: 陈建斌,任素汐,潘斌龙</p>
-							<p>今天55家影院放映607场</p>
-						</div>
-						<div class="btn_mall">
-							购票
-						</div>
-					</li>
-					<li>
-						<div class="pic_show"><img src="/images/movie_2.jpg"></div>
-						<div class="info_list">
-							<h2>毒液：致命守护者</h2>
-							<p>观众评 <span class="grade">9.3</span></p>
-							<p>主演: 汤姆·哈迪,米歇尔·威廉姆斯,里兹·阿迈德</p>
-							<p>今天56家影院放映443场</p>
+							<!-- 什么时候使用{{ item.nm }} ，什么时候使用"item.version"，如下，绑定时使用""，引用是使用{{}} -->
+							<h2>{{ item.nm }} <img v-if="item.version" src="@/assets/maxs.png" alt=""></h2>
+							<p>观众评 <span class="grade">{{item.sc}}9.2</span></p>
+							<p>{{item.star}}</p>
+							<p>今天{{item.showst}}家影院放映{{item.wish}}场</p>
 						</div>
 						<div class="btn_mall">
 							购票
@@ -106,7 +27,22 @@
 
 <script>
 	export default {
-		name:'NowPlaying'
+		name:'NowPlaying',
+		data(){
+			return {
+				movieList:[]
+			}
+		},
+		mounted(){
+			this.axios.get('/api/movieOnInfoList?cityId=10')
+			.then((res)=>{
+				var msg = res.data.msg;
+				if(msg==='ok'){
+					this.movieList = res.data.data.movieList;
+					console.log(this.movieList);
+				}
+			})
+		}
 		
 	}
 </script>

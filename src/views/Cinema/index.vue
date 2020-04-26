@@ -13,7 +13,7 @@
 		  		特色 <i class="iconfont icon-lower-triangle"></i>
 		  	</div>
 		  </div>
-		  <List></List>
+		  <CinemaList></CinemaList>
 	  </div>
 	  <!-- 二级导航内容 -->
 	  
@@ -27,12 +27,12 @@
 // import HelloWorld from '@/components/HelloWorld.vue'
 import Header from '@/components/Header/index.vue';
 import TabBar from '@/components/TabBar/index.vue';
-import List from '@/components/List/index.vue';
+import CinemaList from '@/components/CinemaList/index.vue';
 
 export default {
   name: 'cinema',
   components: {
-    Header,TabBar,List
+    Header,TabBar,CinemaList
   }
 }
 </script>
