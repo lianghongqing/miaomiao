@@ -8,7 +8,8 @@
 				</ul>
 			</div>
 			<!-- ref="city_sort"为了获取这里的dom元素，ref 加在普通的元素上，用this.ref.name 获取到的是dom元素 -->
-			<div class="city_sort" ref="city_sort">  
+			<Loading v-if="isLoading"/>
+			<div else class="city_sort" ref="city_sort">  
 				<!-- 第一层cityList，里面有index和list[] -->
 				<div v-for="item in cityList" :key="item.index">
 					<h2>{{item.index}}</h2>
@@ -23,6 +24,7 @@
 		</div>
 		<div class="city_index">
 			<ul>
+				
 				<li v-for="(item,index) in cityList" :key="item.index" @touchstart="handIndexGoToCity(index)">{{item.index}}</li>
 			</ul>
 		</div>	
@@ -37,7 +39,8 @@
 			return {
 				// 定义数组来接收this.cityList = cityList;
 				cityList:[],
-				hotList:[]
+				hotList:[],
+				isLoading:true
 			}
 		},
 		// mounted是计算机属性
@@ -50,6 +53,7 @@
 			// vue2.0之后，就不再对vue-resource更新，而是推荐使用axios。。。https://www.cnblogs.com/peachmeimei/p/8916098.html
 			this.axios.get('/api/cityList')     //这里使用了vue.config.js的跨域绑定
 			.then((res)=>{
+				this.isLoading = false;
 				// console.log(res);
 				// 有可能数据是没有的,所以要做一个判断
 				var msg = res.data.msg;

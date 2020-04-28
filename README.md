@@ -17,3 +17,7 @@ npm run build
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+### better-scroll
+better-scroll——一款更好用的移动端滚动插件 - 简书
