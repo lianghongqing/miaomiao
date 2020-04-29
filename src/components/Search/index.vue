@@ -50,9 +50,11 @@
 		watch:{
 			searchMsg(newVal){
 				var that = this;
+				// 第18课，城市状态切换城市，参考nowplaying/index.vue
+				var cityId = this.$store.state.city.id;
 				this.cancelRequest();
 				//console.log(newVal);实时获取v-model="searchMsg"的值
-				this.axios.get('/api/searchList?cityId=10&kw='+newVal,{
+				this.axios.get('/api/searchList?cityId='+cityId+'&kw='+newVal,{
 					 cancelToken: new this.axios.CancelToken( function (c) {
 						 // 这里有个that,具体是什么原因要在上面var that = this;需要百度，也可以 写成箭头函数也行
 						 that.source = c;

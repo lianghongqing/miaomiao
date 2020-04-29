@@ -1,32 +1,37 @@
 <template>
 	<div class="city_body">
 		<div class="city_list">
-			<div class="city_hot">
-				<h2>热门城市</h2>
-				<ul class="clearfix">
-					<li v-for="item in hotList" :key="item.id">{{item.nm}}</li>
-				</ul>
-			</div>
-			<!-- ref="city_sort"为了获取这里的dom元素，ref 加在普通的元素上，用this.ref.name 获取到的是dom元素 -->
-			<div class="city_sort" ref="city_sort">  
-				<!-- 第一层cityList，里面有index和list[] -->
-				<div v-for="item in cityList" :key="item.index">
-					<h2>{{item.index}}</h2>
-					<ul>
-						<!-- 第二层list[] -->
-						<li v-for="itemList in item.list" :key="itemList.id">{{itemList.nm}}</li>
-					</ul>
+			<Scroller ref="city_list">
+				<div>
+					<div class="city_hot">
+						<h2>热门城市</h2>
+						<ul class="clearfix">
+							<!-- @tap="handleToCity(item.nm,item.id)"是状态管理store/city/index.js里的动作函数，把点击的nm和id传进去状态里 -->
+							<li v-for="item in hotList" :key="item.id" @tap="handleToCity(item.nm,item.id)">{{item.nm}}</li>
+						</ul>
+					</div>
+					<!-- ref="city_sort"为了获取这里的dom元素，ref 加在普通的元素上，用this.ref.name 获取到的是dom元素 -->
+					<Loading v-if="isLoading"/>
+					<div else class="city_sort" ref="city_sort">  
+						<!-- 第一层cityList，里面有index和list[] -->
+						<div v-for="item in cityList" :key="item.index">
+							<h2>{{item.index}}</h2>
+							<ul>
+								<!-- 第二层list[] -->
+								<li v-for="itemList in item.list" :key="itemList.id" @tap="handleToCity(itemList.nm,itemList.id)">{{itemList.nm}}</li>
+							</ul>
+						</div>
+					</div>
 				</div>
-			</div>
-			
-				
+			</Scroller>	
 		</div>
 		<div class="city_index">
 			<ul>
+				
 				<li v-for="(item,index) in cityList" :key="item.index" @touchstart="handIndexGoToCity(index)">{{item.index}}</li>
 			</ul>
 		</div>	
-	 </div>
+	</div>
 	
 </template>
 
@@ -37,7 +42,8 @@
 			return {
 				// 定义数组来接收this.cityList = cityList;
 				cityList:[],
-				hotList:[]
+				hotList:[],
+				isLoading:true
 			}
 		},
 		// mounted是计算机属性
@@ -46,27 +52,48 @@
 		// created:在模板渲染成html前调用，即通常初始化某些属性值，然后再渲染成视图。
 		// mounted:在模板渲染成html后调用，通常是初始化页面完成后，再对html的dom节点进行一些需要的操作。
 		mounted(){
-			// 这里使用的是main.js里的this.axios,跟使用Vue.use(VueResource)的this.$http.post差不多
-			// vue2.0之后，就不再对vue-resource更新，而是推荐使用axios。。。https://www.cnblogs.com/peachmeimei/p/8916098.html
-			this.axios.get('/api/cityList')     //这里使用了vue.config.js的跨域绑定
-			.then((res)=>{
-				// console.log(res);
-				// 有可能数据是没有的,所以要做一个判断
-				var msg = res.data.msg;
-				if(msg=='ok'){
-					// 获取data下面的cities城市数据
-					var cities = res.data.data.cities;
-					// 获得数据后,我们先分一下组
-					// 例如：[{index:'a',list:[{nm:'a城',id:123}]}]
-					// 在下面创建分组方法formatCityList,然后在这里使用。。。这里要加this是因为已经不在同的方法
-					var {cityList,hotList} = this.formatCityList(cities);
-					// 使用var {cityList,hotList}来接收this.formatCityList(cities)返回的对像结果
-					//console.log(cityList,hotList);
-					this.cityList = cityList;
-					this.hotList = hotList;
-					//console.log(this.cityList);
-				}
-			});
+			// ---------下面是优化,没有也没有问题---------
+			// 增加了本地存储,所以增加判断
+			var cityList = window.localStorage.getItem('cityList');
+			var hotList = window.localStorage.getItem('hotList');
+			if(cityList && hotList){
+				this.cityList = JSON.parse(cityList);
+				this.hotList = JSON.parse(hotList);
+				this.isLoading = false;
+			}else{
+				
+				// 这里使用的是main.js里的this.axios,跟使用Vue.use(VueResource)的this.$http.post差不多
+				// vue2.0之后，就不再对vue-resource更新，而是推荐使用axios。。。https://www.cnblogs.com/peachmeimei/p/8916098.html
+				this.axios.get('/api/cityList')     //这里使用了vue.config.js的跨域绑定
+				.then((res)=>{
+					this.isLoading = false;
+					// console.log(res);
+					// 有可能数据是没有的,所以要做一个判断
+					var msg = res.data.msg;
+					if(msg=='ok'){
+						// 获取data下面的cities城市数据
+						var cities = res.data.data.cities;
+						// 获得数据后,我们先分一下组
+						// 例如：[{index:'a',list:[{nm:'a城',id:123}]}]
+						// 在下面创建分组方法formatCityList,然后在这里使用。。。这里要加this是因为已经不在同的方法
+						var {cityList,hotList} = this.formatCityList(cities);
+						// 使用var {cityList,hotList}来接收this.formatCityList(cities)返回的对像结果
+						//console.log(cityList,hotList);
+						this.cityList = cityList;
+						this.hotList = hotList;
+						//console.log(this.cityList);
+						
+						
+						// ---------下面是优化,没有也没有问题---------
+						// 增加本地存储localStorage.setItem(key,val)
+						window.localStorage.setItem('cityList',JSON.stringify(cityList));
+						window.localStorage.setItem('hotList',JSON.stringify(hotList));
+						// 增加了存储后,就需要在上面this.axios.get('/api/cityList') 之前判断,是否有本地,如有就不访问api
+						// -------优化项完成----------
+					}
+				});
+				
+			}
 		},
 		methods:{
 			// 分组方法
@@ -143,8 +170,22 @@
 				var h2 = this.$refs.city_sort.getElementsByTagName('h2');
 				//console.log(h2);  得到的是HTMLCollection(22) [h2, h2, h2, h2, h2, h2,。。。]
 				// 这里需要特别注意v-for 一定要加上index键值的参数 :v-for="(item,index) in cityList"，不然得不到index
-				this.$refs.city_sort.parentNode.scrollTop = h2[index].offsetTop;
+				// this.$refs.city_sort.parentNode.scrollTop = h2[index].offsetTop;
+				console.log(h2[index]);
+				// 因为增加了scroll滑动组件,所以上述的城市快选已经不行,要改为以下
+				this.$refs.city_list.toScrollTop(-h2[index].offsetTop);
 				
+				
+			},
+			
+			// 状态管理,@tap="handleToCity(item.nm,item.id)"是状态管理store/city/index.js里的动作函数
+			// 把点击的城市id和nm传到状态里记着使用
+			handleToCity(nm,id){
+				console.log(nm,id);
+				this.$store.commit('city/CITY_INFO',{nm,id});
+				window.localStorage.setItem('nowId',id);
+				window.localStorage.setItem('nowNm',nm);
+				this.$router.push('/movie/nowPlaying');
 			}
 		}
 	}

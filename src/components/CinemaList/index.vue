@@ -1,25 +1,27 @@
 <template>
-<div class="cinema_body">
-				<ul>
-					<li v-for="item in cinemaList" :key="item.id">
-						<div>
-							<span>{{item.nm}}</span>
-							<span class="q"><span class="price">1{{item.sellPrice}}</span> 元起</span>
-						</div>
-						<div class="address">
-							<span>{{item.addr}}</span>
-							<span>{{item.distance}}</span>
-						</div>
-						<div class="card">
-                			<!-- <div>小吃</div>
-                			<div>折扣卡</div> -->
-							<div v-for="(itemCard,key) in item.tag" v-if="itemCard===1" :key="key"
-							:class="key | classCard"
-							>{{key | formatCard}}</div>
-       					</div>
-					</li>
-				</ul>
-			</div>
+	<div class="cinema_body">
+		<Scroller>
+			<ul>
+				<li v-for="item in cinemaList" :key="item.id">
+					<div>
+						<span>{{item.nm}}</span>
+						<span class="q"><span class="price">1{{item.sellPrice}}</span> 元起</span>
+					</div>
+					<div class="address">
+						<span>{{item.addr}}</span>
+						<span>{{item.distance}}</span>
+					</div>
+					<div class="card">
+				<!-- <div>小吃</div>
+				<div>折扣卡</div> -->
+						<div v-for="(itemCard,key) in item.tag" v-if="itemCard===1" :key="key"
+						:class="key | classCard"
+						>{{key | formatCard}}</div>
+					</div>
+				</li>
+			</ul>
+		</Scroller>
+	</div>
 		
 </template>		
 	
@@ -30,15 +32,23 @@
 		name:'CinemaList',
 		data(){
 			return{
-				cinemaList:[]
+				cinemaList:[],
+				isLoading:true,
+				prevCityId:-1   //prevCityId上一个城市ID
 			}
 		},
-		mounted(){
-			this.axios.get('/api/cinemaList?cityId=10')
+		activated(){
+			// 第18课，城市状态切换城市，参考nowplaying/index.vue
+			var cityId = this.$store.state.city.id;
+			if(this.prevCityId === cityId){return;}
+			
+			this.axios.get('/api/cinemaList?cityId='+cityId)
 			.then((res)=>{
 				var msg = res.data.msg;
 				if(msg === 'ok'){
 					this.cinemaList = res.data.data.cinemas;
+					// 在获取数据后,又把当前的城市id赋值给上一次（当前）
+					this.prevCityId = cityId;
 				}
 			})
 		},
