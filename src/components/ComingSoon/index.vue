@@ -29,13 +29,22 @@ export default {
 	data() {
 		return {
 			comingList: [],
-			isLoading:true
+			isLoading:true,
+			prevCityId:-1  //参考nowplaying/index.vue
 		};
 	},
-	mounted() {
-		this.axios.get('/api/movieComingList?cityId=10').then(res => {
+	// 原来是mounted,现改为activated,参考nowplaying/index.vue
+	activated() {
+		var cityId = this.$store.state.city.id;
+		if(this.prevCityId === cityId){return;}
+		this.isLoading= true;
+		
+		this.axios.get('/api/movieComingList?cityId='+cityId).then(res => {
 			this.comingList = res.data.data.comingList;
 			this.isLoading = false;
+			// 在获取数据后,又把当前的城市id赋值给上一次（当前）
+			this.prevCityId = cityId;
+			
 		});
 	}
 };

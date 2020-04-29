@@ -1,6 +1,7 @@
 <template>
 		
 	<div class="movie_body" ref="movie_body">
+		<Loading v-if="isLoading" />
 		<!-- :handleToScroll，:handleToScrollEnd把此动作函数父子传参到scroller里 -->
 		<Scroller :handleToScroll="handleToScroll" :handleToScrollEnd="handleToScrollEnd">
 			<ul>
@@ -39,16 +40,33 @@
 		data(){
 			return {
 				movieList:[],
-				pullDownMsg:''
+				pullDownMsg:'',
+				isLoading:true,
+				prevCityId:-1   //prevCityId上一个城市ID，我们这里假设为-1，就跟默认不相同
+		
 			}
 		},
-		mounted(){
-			this.axios.get('/api/movieOnInfoList?cityId=10')
+		// 原来是mounted,现改为activated
+		activated(){
+			
+			// 第18课内容，增加了城市状态$store来动态切换城市数据
+			var cityID = this.$store.state.city.id;
+			
+			// 如果上一次的prevCityId和当前状态的id一样,则代表并没有切换城市,则不走下面的请求
+			if(this.prevCityId === cityID){return;}
+			this.isLoading= true;
+			
+			
+			this.axios.get('/api/movieOnInfoList?cityId='+cityID)
 			.then((res)=>{
+				
 				var msg = res.data.msg;
 				if(msg==='ok'){
 					this.movieList = res.data.data.movieList;
+					this.isLoading= false;
 					//console.log(this.movieList);
+					// 在获取数据后,又把当前的城市id赋值给上一次（当前）
+					this.prevCityId = cityID;
 					
 					// ---增加下拉事件-----但为了其它地方也可以复用，所以这里打包成全局组件，放在components的scroll下
 					/* this.$nextTick(()=>{

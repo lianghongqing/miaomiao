@@ -1,0 +1,31 @@
+<template>
+	<div class="messageBox">
+		<h2>{{title}}</h2>
+		<p>{{content}}</p>
+		<div>
+			<div>{{cancel}}</div>
+			<div>{{ok}}</div>
+			
+		</div>
+	</div>
+</template>
+
+<script>
+	export default {
+		name:'MessgeBox'
+		
+	}
+</script>
+
+<style scoped>
+.messageBox{
+	width: 200px;height: 140px;border: 1px #ccc solid;
+	border-radius: 10px;background: #3C9FE6;margin: -100px 0 0 -100px;
+	box-shadow:3px 3px 3px 3px #C9C9C9;position: absolute;left: 50%;top:50%;
+	}
+.messageBox h2{text-align: center;line-height: 40px;font-size: 18px;}
+.messageBox p{text-align: center;line-height: 40px;color: white;}
+.messageBox > div{display: flex;position: absolute;bottom: 0;width: 100%;border-top: 1px #ccc solid;}
+.messageBox > div div{flex:1;text-align: center;line-height: 30px;border-right: 1px #ccc solid;}
+.messageBox > div div:last-child{border: none;}
+</style>

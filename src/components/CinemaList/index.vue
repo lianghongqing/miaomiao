@@ -32,15 +32,23 @@
 		name:'CinemaList',
 		data(){
 			return{
-				cinemaList:[]
+				cinemaList:[],
+				isLoading:true,
+				prevCityId:-1   //prevCityId上一个城市ID
 			}
 		},
-		mounted(){
-			this.axios.get('/api/cinemaList?cityId=10')
+		activated(){
+			// 第18课，城市状态切换城市，参考nowplaying/index.vue
+			var cityId = this.$store.state.city.id;
+			if(this.prevCityId === cityId){return;}
+			
+			this.axios.get('/api/cinemaList?cityId='+cityId)
 			.then((res)=>{
 				var msg = res.data.msg;
 				if(msg === 'ok'){
 					this.cinemaList = res.data.data.cinemas;
+					// 在获取数据后,又把当前的城市id赋值给上一次（当前）
+					this.prevCityId = cityId;
 				}
 			})
 		},

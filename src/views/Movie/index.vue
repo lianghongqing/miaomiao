@@ -12,7 +12,7 @@
 			<!-- 二级导航栏 -->
 			<div class="movie_menu">
 				<router-link tag="div" to="/movie/city" class="city_name">
-					<span>大连</span><i class="iconfont icon-lower-triangle"></i>
+					<span>{{ $store.state.city.nm }}</span><i class="iconfont icon-lower-triangle"></i>
 				</router-link>
 				<div class="hot_swtich">
 					
@@ -28,7 +28,8 @@
 				<router-view></router-view>
 			</keep-alive>
 		</div>
-  <TabBar></TabBar>
+		
+	<TabBar></TabBar>
   </div>
 
   
@@ -39,12 +40,24 @@
 // import HelloWorld from '@/components/HelloWorld.vue';
 import Header from '@/components/Header/index.vue';
 import TabBar from '@/components/TabBar/index.vue';
+// import {messageBox} from '@/components/JS';
+
 
 export default {
   name: 'movie',
   components: {
     Header,TabBar
-  }
+  },
+  // 调用弹窗
+ //  mounted() {
+ //  	messageBox({
+	// 	title:'当前定位',
+	// 	content:'fds',
+	// 	cancel:'取消',
+	// 	ok: '切换当前'
+	// });
+ //  }
+  
 }
 </script>
 

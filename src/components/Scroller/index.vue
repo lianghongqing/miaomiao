@@ -43,8 +43,15 @@
 			});
 			scroll.on('touchEnd',(pos)=>{
 				this.handleToScrollEnd(pos);
-			})
+			});
 			
+			this.scroll = scroll;
+			
+		},
+		methods:{
+			toScrollTop(y){
+				this.scroll.scrollTo(0,y);
+			}
 		}
 	}
 </script>
