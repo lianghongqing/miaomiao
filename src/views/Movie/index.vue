@@ -29,6 +29,7 @@
 			</keep-alive>
 		</div>
 		
+		
 	<TabBar></TabBar>
   </div>
 
@@ -40,23 +41,47 @@
 // import HelloWorld from '@/components/HelloWorld.vue';
 import Header from '@/components/Header/index.vue';
 import TabBar from '@/components/TabBar/index.vue';
-// import {messageBox} from '@/components/JS';
+
+// 加{}是导入指定模块，不加是默认导入--------???暂时还是不太明白，要百度
+import {messageBox} from '@/components/JS';
 
 
 export default {
-  name: 'movie',
-  components: {
-    Header,TabBar
-  },
-  // 调用弹窗
- //  mounted() {
- //  	messageBox({
-	// 	title:'当前定位',
-	// 	content:'fds',
-	// 	cancel:'取消',
-	// 	ok: '切换当前'
-	// });
- //  }
+	name: 'movie',
+	components: {
+	Header,TabBar
+	},
+	// 调用弹窗
+	mounted() {
+		setTimeout(()=>{
+			this.axios.get('/api/getLocation').then((res)=>{
+			var msg =res.data.msg;
+			var nm = res.data.data.nm;
+			var id = res.data.data.id;
+			// console.log(this.$store.state.city.id,id);  得到的结果前者是字符串,后者是数字,所以 下面只使用==
+			if(this.$store.state.city.id==id){return};
+			if(msg === 'ok'){
+				messageBox({
+					title:'当前定位',
+					content:nm,
+					cancel:'取消',
+					ok: '切换当前',
+					handleOk(){
+						// 把拿到的nm城市存储到本地,以便之后调用
+						window.localStorage.setItem('nowNm',nm);
+						window.localStorage.setItem('nowId',id);
+						// 切换
+						window.location.reload();
+					},
+					handleCancel(){
+						// 取消本就是取消隐藏了,所以 这里并不需要有什么动作
+					}
+				});
+			}
+	  })
+
+		},3000);
+		 	}
   
 }
 </script>

@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import MessageBox from '@/components/JS/MessageBox/index.vue';
+import MessageBox from './MessageBox';
 
 // 这里做一个兼容弹窗,不管到时是城市切换还是其它,都可以使用
 export var messageBox = (function(){
@@ -16,7 +16,7 @@ export var messageBox = (function(){
 	};
 	
 	//使用基础 Vue 构造器，创建一个“子类”。参数是一个包含组件选项的对象。Vue.extend( options )
-	var MyComponent = Vue.extend(messageBox);  //https://cn.vuejs.org/v2/api/index.html#Vue-extend
+	var MyComponent = Vue.extend(MessageBox);  //https://cn.vuejs.org/v2/api/index.html#Vue-extend
 	
 	// 这里返回一个具体调用这个弹窗的function
 	return function(opts){   //opts是配置参数
@@ -37,12 +37,12 @@ export var messageBox = (function(){
 			methods:{
 				handleCancel(){
 					//这里其实&&是判断，当第一个存在，就执行第2个；  ||也是判断，当第一存在就执行第1个
-					defaults.handleCancel  &&  defaults.handleCancel.bind(this);  
+					defaults.handleCancel  &&  defaults.handleCancel.call(this);  
 					// 当点击这2个方法的时候,都需要把弹窗删除掉,不能长时间在页面上removeChild()删除子节点
 					document.body.removeChild(vm.$el);
 				},
 				handleOk(){
-					defaults.handleOk  &&  defaults.handleOk.bind(this);
+					defaults.handleOk  &&  defaults.handleOk.call(this);
 					document.body.removeChild(vm.$el);
 				},
 			}
